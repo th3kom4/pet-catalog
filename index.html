@@ -16,35 +16,37 @@
         </nav>
     </header>
 
-    <main>
-        <section id="filters">
-            <h2>Фільтри</h2>
-            <form>
-                <label for="species-filter">Вид тварини:</label>
-                <select id="species-filter" name="species">
-                    <option value="all">Всі види</option>
-                    <option value="cat">Коти</option>
-                    <option value="dog">Собаки</option>
-                </select>
-            </form>
-        </section>
+	<main>
+        <div class="main-content">
+            <section id="filters">
+                <h2>Фільтри</h2>
+                <form>
+                    <label for="species-filter">Вид тварини:</label>
+                    <select id="species-filter" name="species">
+                        <option value="all">Всі види</option>
+                        <option value="cat">Коти</option>
+                        <option value="dog">Собаки</option>
+                    </select>
+                </form>
+            </section>
 
-        <section id="pets">
-            <h2>Тварини</h2>
-            <!-- Перша картка тварини -->
-            <article>
-                <h3>Британська короткошерста</h3>
-                <img src="assets/img/cat.jpg" alt="Фото британської короткошерстої кішки">
-                <p>Розмір: Середній</p>
-            </article>
-            
-            <!-- Друга картка тварини -->
-            <article>
-                <h3>Золотистий ретривер</h3>
-                <img src="assets/img/dog.jpeg" alt="Фото золотистого ретривера">
-                <p>Розмір: Великий</p>
-            </article>
-        </section>
+            <section id="pets">
+                <h2>Тварини</h2>
+                <div class="cards">
+                    <article>
+                        <h3>Британська короткошерста</h3>
+                        <img src="assets/img/cat.jpg" alt="Фото британської короткошерстої кішки">
+                        <p>Розмір: Середній</p>
+                    </article>
+                    
+                    <article>
+                        <h3>Золотистий ретривер</h3>
+                        <img src="assets/img/dog.jpeg" alt="Фото золотистого ретривера">
+                        <p>Розмір: Великий</p>
+                    </article>
+                </div>
+            </section>
+        </div>
         
         <aside>
             <h2>Деталі догляду</h2>

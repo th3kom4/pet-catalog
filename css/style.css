@@ -1,0 +1,107 @@
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: system-ui, -apple-system, sans-serif;
+    line-height: 1.5;
+    color: #333333;
+    background-color: #fefdf6;
+}
+
+header {
+    background-color: #dcedc8;
+    padding: 24px;
+    text-align: center;
+    border-bottom: 2px solid #c5e1a5;
+}
+
+header h1 {
+    margin: 0 0 12px 0;
+    color: #33691e;
+}
+
+header nav a {
+    text-decoration: none;
+    color: #558b2f;
+    font-weight: bold;
+    margin-right: 16px;
+}
+
+header nav a:hover {
+    color: #33691e;
+    text-decoration: underline;
+}
+
+main {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 24px 16px;
+}
+
+#filters {
+    margin-bottom: 32px;
+}
+
+#filters form {
+    padding: 16px;
+    background-color: #fff9c4;
+    border-radius: 8px;
+}
+
+#filters label, 
+#filters select {
+    margin-right: 12px;
+}
+
+#filters select {
+    padding: 4px 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+#pets {
+    margin-bottom: 32px;
+}
+
+article {
+    padding: 16px;
+    border-radius: 10px;
+    background-color: #ffffff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    margin-bottom: 20px;
+}
+
+article h3 {
+    margin-top: 0;
+    color: #33691e;
+}
+
+article img {
+    border-radius: 10px;
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin-bottom: 12px;
+}
+
+aside {
+    border: 1px solid #c5e1a5;
+    padding: 16px;
+    background-color: #f1f8e9;
+    border-radius: 10px;
+}
+
+aside h2 {
+    margin-top: 0;
+    color: #558b2f;
+}
+
+footer {
+    text-align: center;
+    padding: 24px;
+    font-size: 0.9rem;
+    color: #777;
+    background-color: #eeeeee;
+}

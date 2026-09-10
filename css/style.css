@@ -86,11 +86,13 @@ article h3 {
     color: #33691e;
 }
 
-article img {
+article img.pet-img {
     border-radius: 10px;
-    max-width: 100%;
-    height: auto;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
     display: block;
+    margin-top: 12px;
     margin-bottom: 12px;
 }
 
@@ -144,3 +146,33 @@ footer {
         grid-template-columns: repeat(4, 1fr);
     }
 }
+
+/*
+   НЕЧІТКА ВИМОГА: "має виглядати доброзичливо й затишно".
+   ОБҐРУНТУВАННЯ: Для створення відчуття затишку використано м'яку теплу палітру
+   (світло-жовтий фон #fefdf6, зелені акценти #dcedc8). Замість гострих кутів, які
+   виглядають суворо, застосовано border-radius 10px для карток, зображень та блоків.
+   Це формує доброзичливий інтерфейс, що психологічно асоціюється з домашніми улюбленцями.
+*/
+
+/* Чітка вимога: підпис виду шрифтом мінімум 14px */
+.species {
+    font-size: 14px;
+    color: #555555;
+    margin-bottom: 12px;
+    margin-top: 0;
+}
+
+/* Деталі: розмір тварини позначений кольоровим бейджем */
+.badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+    color: #ffffff;
+}
+
+.badge--small { background-color: #81c784; }  /* М'який зелений */
+.badge--medium { background-color: #ffb74d; } /* Теплий помаранчевий */
+.badge--large { background-color: #e57373; }  /* Приглушений червоний */

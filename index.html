@@ -1,22 +1,61 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Каталог тварин</title>
-	<link rel="stylesheet" href="css/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Каталог тварин</title>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-	<!-- Шапка з навігацією та пошуком -->
+    <header>
+        <h1>Каталог тварин</h1>
+        <nav>
+            <a href="#cats">Коти</a>
+            <a href="#dogs">Собаки</a>
+            <a href="#fish">Акваріумні риби</a>
+        </nav>
+    </header>
 
-	<!-- Блок фільтрів за видом/розміром -->
+    <main>
+        <section id="filters">
+            <h2>Фільтри</h2>
+            <form>
+                <label for="species-filter">Вид тварини:</label>
+                <select id="species-filter" name="species">
+                    <option value="all">Всі види</option>
+                    <option value="cat">Коти</option>
+                    <option value="dog">Собаки</option>
+                </select>
+            </form>
+        </section>
 
-	<!-- Список карток тварин -->
+        <section id="pets">
+            <h2>Тварини</h2>
+            <!-- Перша картка тварини -->
+            <article>
+                <h3>Британська короткошерста</h3>
+                <img src="assets/img/placeholder.jpg" alt="Фото британської короткошерстої кішки">
+                <p>Розмір: Середній</p>
+            </article>
+            
+            <!-- Друга картка тварини -->
+            <article>
+                <h3>Золотистий ретривер</h3>
+                <img src="assets/img/placeholder.jpg" alt="Фото золотистого ретривера">
+                <p>Розмір: Великий</p>
+            </article>
+        </section>
+        
+        <aside>
+            <h2>Деталі догляду</h2>
+            <p>Оберіть тварину зі списку, щоб побачити правила догляду за нею.</p>
+        </aside>
+    </main>
 
-	<!-- Блок деталей обраної тварини (догляд) -->
+    <footer>
+        <p>&copy; 2026 Навчальний проєкт. Виконав Комаренко Т.В.</p>
+    </footer>
 
-	<!-- Підвал -->
-
-	<script src="js/app.js" defer></script>
+    <script src="js/app.js" defer></script>
 </body>
 </html>

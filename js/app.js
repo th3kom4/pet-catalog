@@ -61,3 +61,77 @@ function renderPets(petsArray) {
 
 // Виклик рендеру з реальним масивом даних
 renderPets(animals);
+
+// 1. Вибір елементів
+const addPetForm = document.querySelector('#add-pet-form');
+const ageInput = document.querySelector('#pet-age');
+const speciesFilter = document.querySelector('#species-filter');
+
+// Додаткова клієнтська валідація
+// Валідація на подію 'input' для поля віку
+ageInput.addEventListener('input', (event) => {
+    const age = Number(event.target.value);
+
+    // Перевірка: вік менше 0 або більше 50
+    if (age < 0 || age > 50) {
+        // Власне повідомлення про помилку
+        event.target.setCustomValidity('Вік тварини має бути від 0 до 50 років!');
+    } else {
+        // Очищення помилки, якщо значення коректне
+        event.target.setCustomValidity('');
+    }
+});
+
+// Обробка надсилання форми
+addPetForm.addEventListener('submit', (event) => {
+    // Скасовуємо перезавантаження сторінки
+    event.preventDefault();
+
+    // Зчитуємо значення полів
+    const nameValue = document.querySelector('#pet-name').value.trim();
+    const speciesValue = document.querySelector('#pet-species').value;
+    const ageValue = Number(document.querySelector('#pet-age').value);
+
+	// Визначаємо правильний шлях до фотографії залежно від виду
+    let imagePath = 'assets/img/cat.jpg';
+    
+    if (speciesValue === 'Собака') {
+        imagePath = 'assets/img/dog.jpg';
+    } else if (speciesValue === 'Риба') {
+        imagePath = 'assets/img/fish.avif';
+    }
+
+    // Збираємо новий об'єкт
+    const newPet = {
+        name: nameValue,
+        species: speciesValue,
+        ageYears: ageValue,
+        image: imagePath 
+    };
+
+    // Додаємо в загальний масив
+    animals.push(newPet);
+
+    // Перемальовуємо список
+    renderPets(animals);
+
+    // Очищуємо форму
+    addPetForm.reset();
+
+    // Скидаємо фільтр на "Всі", щоб точно побачити додану тварину
+    speciesFilter.value = 'Всі';
+});
+
+// Друга подія варіанта фільтрація
+speciesFilter.addEventListener('change', (event) => {
+    const selectedSpecies = event.target.value;
+
+    if (selectedSpecies === 'Всі') {
+        // Якщо вибрано "Всі", рендеримо весь масив
+        renderPets(animals);
+    } else {
+        // Інакше фільтруємо масив за вибраним видом
+        const filteredAnimals = animals.filter(pet => pet.species === selectedSpecies);
+        renderPets(filteredAnimals);
+    }
+});

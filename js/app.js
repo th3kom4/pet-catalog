@@ -76,7 +76,7 @@ const PetCard = {
     data() {
         return {
             // Локальний реактивний стан компонента (прапорець "обране")
-            isFavorite: false 
+            isFavorite: false
         };
     },
     
@@ -118,6 +118,9 @@ createApp({
         return {
             // Масив даних каталогу
            	animals: [],
+			isAnimationRunning: true,
+            animationFrameId: null,
+            fishList: [],
 
             // Стан для фільтрації
             currentFilter: 'Всі',
@@ -149,6 +152,7 @@ createApp({
 
 	async mounted() {
         await this.initializeData();
+		this.initCanvasAquarium();
     },
     
     // Обробники подій та функції
@@ -181,6 +185,7 @@ createApp({
                 }
 
                 this.animals = dbPets;
+				this.syncFishCount();
                 saveToLocalStorage(this.animals);
             } catch (error) {
                 console.error('Помилка доступу до IndexedDB:', error);
@@ -208,6 +213,7 @@ createApp({
 
             await savePetToDB(createdPet);
             this.animals.push(createdPet);
+			this.syncFishCount();
             saveToLocalStorage(this.animals);
 
             // Очищаємо форму
@@ -222,6 +228,7 @@ createApp({
         async deletePet(id) {
             await deletePetFromDB(id);
             this.animals = this.animals.filter(pet => pet.id !== id);
+			this.syncFishCount();
             saveToLocalStorage(this.animals);
         },
 
@@ -254,6 +261,7 @@ createApp({
 
                 await savePetToDB(randomDog);
                 this.animals.push(randomDog);
+				this.syncFishCount();
                 saveToLocalStorage(this.animals);
                 this.currentFilter = 'Всі';
 
@@ -262,6 +270,121 @@ createApp({
                 this.apiError = 'Не вдалося завантажити собаку з API. Перевірте підключення до Інтернету або спробуйте пізніше.';
             } finally {
                 this.isLoading = false;
+            }
+        },
+
+		// Ініціалізація та синхронізація рибок із кількістю тварин
+        initCanvasAquarium() {
+            const canvas = document.getElementById('aquariumCanvas');
+            if (!canvas) return;
+
+            this.syncFishCount();
+            this.startAnimation();
+        },
+
+        syncFishCount() {
+            const canvas = document.getElementById('aquariumCanvas');
+            if (!canvas) return;
+
+            // Кількість рибок відповідає кількості тварин у каталозі (мінімум 1, максимум 15)
+            const targetCount = Math.min(Math.max(this.animals.length, 1), 15);
+
+            while (this.fishList.length < targetCount) {
+                this.fishList.push({
+                    x: Math.random() * canvas.width,
+                    baseY: 30 + Math.random() * (canvas.height - 60),
+                    speed: 1 + Math.random() * 1.5,
+                    amplitude: 8 + Math.random() * 12,
+                    frequency: 0.02 + Math.random() * 0.03,
+                    color: ['#ff7043', '#ffa726', '#26a69a', '#ab47bc'][Math.floor(Math.random() * 4)],
+                    size: 14 + Math.random() * 8
+                });
+            }
+
+            while (this.fishList.length > targetCount) {
+                this.fishList.pop();
+            }
+        },
+
+        // Малювання однієї рибки з тілом, хвостом і оком
+        drawFish(ctx, fish, time) {
+            // Рух по синусоїді: y = baseY + sin(x * frequency) * amplitude
+            const y = fish.baseY + Math.sin((fish.x + time) * fish.frequency) * fish.amplitude;
+
+            ctx.save();
+            ctx.translate(fish.x, y);
+
+            ctx.fillStyle = fish.color;
+
+            // Тіло рибки (еліпс)
+            ctx.beginPath();
+            ctx.ellipse(0, 0, fish.size, fish.size * 0.55, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Хвіст (трикутник)
+            ctx.beginPath();
+            ctx.moveTo(-fish.size * 0.8, 0);
+            ctx.lineTo(-fish.size * 1.5, -fish.size * 0.45);
+            ctx.lineTo(-fish.size * 1.5, fish.size * 0.45);
+            ctx.closePath();
+            ctx.fill();
+
+            // Око
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(fish.size * 0.45, -fish.size * 0.15, fish.size * 0.15, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#000000';
+            ctx.beginPath();
+            ctx.arc(fish.size * 0.5, -fish.size * 0.15, fish.size * 0.08, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.restore();
+        },
+
+        // Цикл анімації через requestAnimationFrame
+        renderAquarium() {
+            const canvas = document.getElementById('aquariumCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const time = Date.now() * 0.05;
+
+            for (const fish of this.fishList) {
+                fish.x += fish.speed;
+                if (fish.x - fish.size * 2 > canvas.width) {
+                    fish.x = -fish.size * 2;
+                    fish.baseY = 30 + Math.random() * (canvas.height - 60);
+                }
+                this.drawFish(ctx, fish, time);
+            }
+
+            if (this.isAnimationRunning) {
+				this.animationFrameId = requestAnimationFrame(() => this.renderAquarium());
+            }
+        },
+
+        startAnimation() {
+            if (!this.isAnimationRunning) {
+                this.isAnimationRunning = true;
+            }
+            cancelAnimationFrame(this.animationFrameId);
+			this.animationFrameId = requestAnimationFrame(() => this.renderAquarium());
+        },
+
+        stopAnimation() {
+            this.isAnimationRunning = false;
+            cancelAnimationFrame(this.animationFrameId);
+        },
+
+        toggleAnimation() {
+            if (this.isAnimationRunning) {
+                this.stopAnimation();
+            } else {
+                this.startAnimation();
             }
         }
     }

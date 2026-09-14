@@ -67,6 +67,19 @@
                 </p>
             </section>
 
+			<section id="aquarium-section" style="margin-top: 24px; margin-bottom: 24px; text-align: center;">
+                <h2>Інтерактивний акваріум</h2>
+                <p style="font-size: 0.9em; color: #555;">Кількість рибок залежить від кількості тварин у каталозі ({{ animals.length }})</p>
+                <div style="display: inline-block; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); border: 2px solid #81c784;">
+                    <canvas id="aquariumCanvas" width="600" height="180" style="background: linear-gradient(180deg, #e0f7fa 0%, #80deea 100%); display: block;"></canvas>
+                </div>
+                <div style="margin-top: 10px;">
+                    <button type="button" @click="toggleAnimation" style="padding: 6px 16px; border: none; border-radius: 6px; background-color: #558b2f; color: white; cursor: pointer; font-weight: bold;">
+                        {{ isAnimationRunning ? 'Зупинити анімацію' : 'Запустити анімацію' }}
+                    </button>
+                </div>
+            </section>
+
             <section id="pets">
                 <h2>Тварини</h2>
                 <p style="font-weight: bold; color: #33691e;">Всього тварин: {{ filteredPets.length }}</p>

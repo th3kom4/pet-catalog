@@ -10,15 +10,17 @@
     <header>
         <h1>Каталог тварин</h1>
         <nav>
-            <a href="#cats">Коти</a>
-            <a href="#dogs">Собаки</a>
-            <a href="#fish">Акваріумні риби</a>
+            <a href="#/">Всі</a>
+            <a href="#/species/Кіт">Коти</a>
+            <a href="#/species/Собака">Собаки</a>
+            <a href="#/species/Риба">Акваріумні риби</a>
         </nav>
     </header>
 
     <main>
         <div id="app" class="main-content">
-            
+
+            <div v-if="currentRoute.name === 'home' || currentRoute.name === 'species'">
             <section id="add-pet-section">
                 <h2>Додати нову тварину</h2>
                 <form @submit.prevent="addNewPet">
@@ -93,6 +95,34 @@
                     ></pet-card>
             	</div>
 			</section>
+			</div>
+
+			<!-- Екран деталей тварини (#/pets/:id) -->
+            <section v-else-if="currentRoute.name === 'pet-detail'" style="background: #ffffff; padding: 24px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); max-width: 600px; margin: 0 auto;">
+                <div v-if="selectedPet">
+                    <a href="#/" style="display: inline-block; margin-bottom: 16px; color: #558b2f; font-weight: bold; text-decoration: none;">&larr; Назад до каталогу</a>
+                    <h2 style="color: #33691e; margin-top: 0;">{{ selectedPet.name }}</h2>
+                    <img :src="selectedPet.image" :alt="selectedPet.name" style="width: 100%; max-height: 350px; object-fit: cover; border-radius: 8px; margin-bottom: 16px;">
+                    <p><strong>Вид:</strong> {{ selectedPet.species }}</p>
+                    <p><strong>Вік:</strong> {{ selectedPet.ageYears }} р.</p>
+                    <p style="background: #f1f8e9; padding: 12px; border-radius: 8px; border-left: 4px solid #81c784;">
+                        <strong>Нотатки про улюбленця:</strong> {{ selectedPet.notes || 'Нотаток немає' }}
+                    </p>
+                </div>
+                <div v-else style="text-align: center; padding: 24px;">
+                    <p style="color: #e57373; font-weight: bold;">Тварину з таким ідентифікатором не знайдено.</p>
+                    <a href="#/" style="color: #558b2f; font-weight: bold;">Повернутися на головну</a>
+                </div>
+            </section>
+
+            <!-- Екран 404 (Маршрут не знайдено) -->
+            <section v-else-if="currentRoute.name === 'not-found'" style="text-align: center; padding: 48px 16px; background: #ffffff; border-radius: 12px;">
+                <h2 style="color: #d32f2f; font-size: 2rem;">404 - Сторінку не знайдено</h2>
+                <p>Запитуваної адреси не існує або вона була переміщена.</p>
+                <a href="#/" style="display: inline-block; margin-top: 16px; padding: 10px 20px; background-color: #558b2f; color: white; text-decoration: none; border-radius: 6px; font-weight: bold;">
+                    Повернутися до списку тварин
+                </a>
+            </section>
         </div>
         
         <aside>

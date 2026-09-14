@@ -87,7 +87,11 @@ const PetCard = {
             @click="isFavorite = !isFavorite" 
             style="cursor: pointer; position: relative;"
         >
-            <h3>{{ pet.name }}</h3>
+            <h3>
+				<a :href="'#/pets/' + pet.id" @click.stop style="color: inherit; text-decoration: none;">
+                    {{ pet.name }}
+                </a>
+			</h3>
             <!-- Зірочка з'явиться тільки якщо isFavorite === true -->
             <span v-if="isFavorite" style="position: absolute; top: 10px; right: 10px; font-size: 24px;">⭐</span>
             <img :src="pet.image" :alt="'Фото тварини: ' + pet.name" class="pet-img">
@@ -122,6 +126,12 @@ createApp({
             animationFrameId: null,
             fishList: [],
 
+			// Стан клієнтського роутера
+            currentRoute: {
+                name: 'home',
+                params: {}
+            },
+
             // Стан для фільтрації
             currentFilter: 'Всі',
             
@@ -143,16 +153,32 @@ createApp({
     computed: {
         // Автоматична фільтрація масиву
         filteredPets() {
-            if (this.currentFilter === 'Всі') {
+			// Якщо користувач перейшов за маршрутом #/species/:species
+            if (this.currentRoute.name === 'species' && this.currentRoute.params.species) {
+                const targetSpecies = decodeURIComponent(this.currentRoute.params.species);
+                return this.animals.filter(pet => pet.species.toLowerCase() === targetSpecies.toLowerCase());
+            }
+
+			if (this.currentFilter === 'Всі') {
                 return this.animals;
             }
             return this.animals.filter(pet => pet.species === this.currentFilter);
+        },
+		selectedPet() {
+            if (this.currentRoute.name === 'pet-detail' && this.currentRoute.params.id) {
+                return this.animals.find(pet => String(pet.id) === String(this.currentRoute.params.id));
+            }
+            return null;
         }
     },
 
 	async mounted() {
         await this.initializeData();
 		this.initCanvasAquarium();
+
+		// Ініціалізація клієнтської маршрутизації
+        window.addEventListener('hashchange', () => this.handleRoute());
+        this.handleRoute();
     },
     
     // Обробники подій та функції
@@ -271,6 +297,43 @@ createApp({
             } finally {
                 this.isLoading = false;
             }
+        },
+
+		// Обробка зміни маршруту на основі location.hash
+        handleRoute() {
+            const rawHash = window.location.hash.slice(1) || '/';
+            const cleanPath = rawHash.split('?')[0];
+
+            // Таблиця патернів маршрутів
+            const routes = [
+                { pattern: /^\/$/, name: 'home' },
+                { pattern: /^\/pets\/([^/]+)$/, name: 'pet-detail', paramKeys: ['id'] },
+                { pattern: /^\/species\/([^/]+)$/, name: 'species', paramKeys: ['species'] }
+            ];
+
+            for (const route of routes) {
+                const match = cleanPath.match(route.pattern);
+                if (match) {
+                    const params = {};
+                    if (route.paramKeys) {
+                        route.paramKeys.forEach((key, index) => {
+                            params[key] = match[index + 1];
+                        });
+                    }
+                    this.currentRoute = { name: route.name, params };
+
+                    // Якщо повертаємось на головну — переконуємось що canvas активний
+                    if (route.name === 'home' || route.name === 'species') {
+                        this.$nextTick(() => {
+                            this.initCanvasAquarium();
+                        });
+                    }
+                    return;
+                }
+            }
+
+            // Якщо збігу не знайдено — маршрут 404
+            this.currentRoute = { name: 'not-found', params: {} };
         },
 
 		// Ініціалізація та синхронізація рибок із кількістю тварин

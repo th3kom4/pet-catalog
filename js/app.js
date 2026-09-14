@@ -135,3 +135,63 @@ speciesFilter.addEventListener('change', (event) => {
         renderPets(filteredAnimals);
     }
 });
+
+// Константа URL та вибір елементів
+const DOG_API_URL = 'https://dog.ceo/api/breeds/image/random';
+const fetchDogBtn = document.querySelector('#fetch-dog-btn');
+const loadingIndicator = document.querySelector('#loading-indicator');
+const errorMessage = document.querySelector('#error-message');
+
+// Асинхронна функція запиту
+async function loadRandomDog() {
+    // Показуємо стан завантаження та ховаємо помилки
+    loadingIndicator.style.display = 'block';
+    errorMessage.style.display = 'none';
+    fetchDogBtn.disabled = true; // Блокуємо кнопку від подвійних кліків
+
+    try {
+        // Виконуємо запит до API
+        const response = await fetch(DOG_API_URL);
+
+        // Перевіряємо HTTP-статус
+        if (!response.ok) {
+            throw new Error(`Сервер відповів помилкою: ${response.status}`);
+        }
+
+        // Розбираємо отриманий JSON
+        const data = await response.json();
+
+        // Специфічна перевірка на статус успіху для Dog API
+        if (data.status !== 'success') {
+            throw new Error('API повернуло статус помилки всередині JSON');
+        }
+
+        // Формуємо об'єкт тварини з отриманим фото
+        const randomDog = {
+            name: 'Пес',
+            species: 'Собака',
+            ageYears: Math.floor(Math.random() * 10) + 1,
+            image: data.message
+        };
+
+        // Додаємо в масив та оновлюємо DOM
+        animals.push(randomDog);
+        renderPets(animals);
+
+        // Скидаємо фільтр, щоб побачити нову собаку
+        speciesFilter.value = 'Всі';
+
+    } catch (error) {
+        // Обробляємо та виводимо помилку
+        console.error('Помилка завантаження API:', error);
+        errorMessage.textContent = 'Не вдалося завантажити собаку з API. Перевірте підключення до Інтернету або спробуйте пізніше.';
+        errorMessage.style.display = 'block';
+    } finally {
+        // Ховаємо індикатор завантаження і розблоковуємо кнопку
+        loadingIndicator.style.display = 'none';
+        fetchDogBtn.disabled = false;
+    }
+}
+
+// Обробник події кліку на кнопку
+fetchDogBtn.addEventListener('click', loadRandomDog);

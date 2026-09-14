@@ -52,7 +52,7 @@ main {
     gap: 24px;
 }
 
-#filters form, #add-pet-form {
+#filters form, #add-pet-form, form {
     padding: 16px;
     background-color: #fff9c4;
     border-radius: 8px;

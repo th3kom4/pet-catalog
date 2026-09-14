@@ -1,197 +1,139 @@
-console.log('app.js підключено успішно!');
+const { createApp } = Vue;
 
-// Оголошення даних (додав поле image для відображення фото)
-const animals = [
-    { name: 'Британська короткошерста', species: 'Кіт', ageYears: 1, image: 'assets/img/cat.jpg' },
-    { name: 'Золотистий ретривер', species: 'Собака', ageYears: 4, image: 'assets/img/dog.jpg' },
-    { name: 'Немо', species: 'Риба', ageYears: 0.5, image: 'assets/img/fish.avif' }
-];
-
-// Видалення статичного прикладу
-const staticCards = document.querySelectorAll('.static-card');
-staticCards.forEach(card => card.remove()); // Видаляємо вузли з DOM
-
-// Вибір контейнерів
-const listContainer = document.querySelector('#pets-list');
-const countElement = document.querySelector('#pets-count');
-
-// Функція рендеру
-function renderPets(petsArray) {
-    // Очищаємо контейнер перед рендером (на випадок повторного виклику)
-    listContainer.innerHTML = '';
-
-    for (const pet of petsArray) {
-        // Створення елементів
-        const card = document.createElement('article'); // Контейнер картки
-        
-        const title = document.createElement('h3');
-        title.textContent = pet.name;
-        
-        const img = document.createElement('img');
-        img.src = pet.image;
-        img.classList.add('pet-img'); // Відновлюємо наші CSS-стилі пропорцій
-        
-        const speciesDesc = document.createElement('p');
-        speciesDesc.textContent = `Вид: ${pet.species}`;
-        speciesDesc.classList.add('species');
-
-        // Додавання атрибутів та умовних класів
-        img.setAttribute('alt', `Фото тварини: ${pet.name}`); // Атрибут img.alt
-        card.dataset.species = pet.species.toLowerCase(); // Атрибут data-species
-
-        // Клас: young або adult за ageYears
-        if (pet.ageYears < 2) {
-            card.classList.add('young');
-        } else {
-            card.classList.add('adult');
-        }
-
-        // Додавання елементів у контейнер
-        // Збираємо картку як конструктор
-        card.append(title, img, speciesDesc);
-        // Вставляємо готову картку на сторінку
-        listContainer.append(card);
-    }
-
-    // Оновлення підсумкового елемента
-    if (countElement) {
-        countElement.textContent = `Всього тварин: ${petsArray.length}`;
-    }
-}
-
-// Виклик рендеру з реальним масивом даних
-renderPets(animals);
-
-// 1. Вибір елементів
-const addPetForm = document.querySelector('#add-pet-form');
-const ageInput = document.querySelector('#pet-age');
-const speciesFilter = document.querySelector('#species-filter');
-
-// Додаткова клієнтська валідація
-// Валідація на подію 'input' для поля віку
-ageInput.addEventListener('input', (event) => {
-    const age = Number(event.target.value);
-
-    // Перевірка: вік менше 0 або більше 50
-    if (age < 0 || age > 50) {
-        // Власне повідомлення про помилку
-        event.target.setCustomValidity('Вік тварини має бути від 0 до 50 років!');
-    } else {
-        // Очищення помилки, якщо значення коректне
-        event.target.setCustomValidity('');
-    }
-});
-
-// Обробка надсилання форми
-addPetForm.addEventListener('submit', (event) => {
-    // Скасовуємо перезавантаження сторінки
-    event.preventDefault();
-
-    // Зчитуємо значення полів
-    const nameValue = document.querySelector('#pet-name').value.trim();
-    const speciesValue = document.querySelector('#pet-species').value;
-    const ageValue = Number(document.querySelector('#pet-age').value);
-
-	// Визначаємо правильний шлях до фотографії залежно від виду
-    let imagePath = 'assets/img/cat.jpg';
+// Оголошення компонента PetCard
+const PetCard = {
+    // props - дані, які компонент отримує від батьківського списку
+    props: ['name', 'species', 'ageYears', 'image'],
     
-    if (speciesValue === 'Собака') {
-        imagePath = 'assets/img/dog.jpg';
-    } else if (speciesValue === 'Риба') {
-        imagePath = 'assets/img/fish.avif';
-    }
-
-    // Збираємо новий об'єкт
-    const newPet = {
-        name: nameValue,
-        species: speciesValue,
-        ageYears: ageValue,
-        image: imagePath 
-    };
-
-    // Додаємо в загальний масив
-    animals.push(newPet);
-
-    // Перемальовуємо список
-    renderPets(animals);
-
-    // Очищуємо форму
-    addPetForm.reset();
-
-    // Скидаємо фільтр на "Всі", щоб точно побачити додану тварину
-    speciesFilter.value = 'Всі';
-});
-
-// Друга подія варіанта фільтрація
-speciesFilter.addEventListener('change', (event) => {
-    const selectedSpecies = event.target.value;
-
-    if (selectedSpecies === 'Всі') {
-        // Якщо вибрано "Всі", рендеримо весь масив
-        renderPets(animals);
-    } else {
-        // Інакше фільтруємо масив за вибраним видом
-        const filteredAnimals = animals.filter(pet => pet.species === selectedSpecies);
-        renderPets(filteredAnimals);
-    }
-});
-
-// Константа URL та вибір елементів
-const DOG_API_URL = 'https://dog.ceo/api/breeds/image/random';
-const fetchDogBtn = document.querySelector('#fetch-dog-btn');
-const loadingIndicator = document.querySelector('#loading-indicator');
-const errorMessage = document.querySelector('#error-message');
-
-// Асинхронна функція запиту
-async function loadRandomDog() {
-    // Показуємо стан завантаження та ховаємо помилки
-    loadingIndicator.style.display = 'block';
-    errorMessage.style.display = 'none';
-    fetchDogBtn.disabled = true; // Блокуємо кнопку від подвійних кліків
-
-    try {
-        // Виконуємо запит до API
-        const response = await fetch(DOG_API_URL);
-
-        // Перевіряємо HTTP-статус
-        if (!response.ok) {
-            throw new Error(`Сервер відповів помилкою: ${response.status}`);
-        }
-
-        // Розбираємо отриманий JSON
-        const data = await response.json();
-
-        // Специфічна перевірка на статус успіху для Dog API
-        if (data.status !== 'success') {
-            throw new Error('API повернуло статус помилки всередині JSON');
-        }
-
-        // Формуємо об'єкт тварини з отриманим фото
-        const randomDog = {
-            name: 'Пес',
-            species: 'Собака',
-            ageYears: Math.floor(Math.random() * 10) + 1,
-            image: data.message
+    data() {
+        return {
+            // Локальний реактивний стан компонента (прапорець "обране")
+            isFavorite: false 
         };
+    },
+    
+    // Шаблон картки з динамічними класами та подією кліку
+    template: `
+        <article 
+            :class="{ young: ageYears < 2, adult: ageYears >= 2 }" 
+            @click="isFavorite = !isFavorite" 
+            style="cursor: pointer; position: relative;"
+        >
+            <h3>{{ name }}</h3>
+            <!-- Зірочка з'явиться тільки якщо isFavorite === true -->
+            <span v-if="isFavorite" style="position: absolute; top: 10px; right: 10px; font-size: 24px;">⭐</span>
+            <img :src="image" :alt="'Фото тварини: ' + name" class="pet-img">
+            <p class="species">Вид: {{ species }}</p>
+            <p>Вік: {{ ageYears }} р.</p>
+        </article>
+    `
+};
 
-        // Додаємо в масив та оновлюємо DOM
-        animals.push(randomDog);
-        renderPets(animals);
+// Створення головного Vue-застосунку
+createApp({
+    // Реєструємо компонент для використання в HTML
+    components: {
+        'pet-card': PetCard
+    },
+    
+    // Реактивний стан
+    data() {
+        return {
+            // Масив даних каталогу
+            animals: [
+                { name: 'Британська короткошерста', species: 'Кіт', ageYears: 1, image: 'assets/img/cat.jpg' },
+                { name: 'Золотистий ретривер', species: 'Собака', ageYears: 4, image: 'assets/img/dog.jpg' },
+                { name: 'Немо', species: 'Риба', ageYears: 0.5, image: 'assets/img/fish.avif' }
+            ],
+            
+            // Стан для фільтрації
+            currentFilter: 'Всі',
+            
+            // Об'єкт для збору даних з форми додавання
+            newPet: {
+                name: '',
+                species: 'Кіт',
+                ageYears: 0
+            },
+            
+            // Стани для роботи з API
+            isLoading: false,
+            apiError: ''
+        };
+    },
+    
+    // Похідні (обчислювані) значення
+    computed: {
+        // Автоматична фільтрація масиву
+        filteredPets() {
+            if (this.currentFilter === 'Всі') {
+                return this.animals;
+            }
+            return this.animals.filter(pet => pet.species === this.currentFilter);
+        }
+    },
+    
+    // Обробники подій та функції
+    methods: {
+        // Додавання нової тварини
+        addNewPet() {
+            let imagePath = 'assets/img/cat.jpg';
+            if (this.newPet.species === 'Собака') {
+                imagePath = 'assets/img/dog.jpg';
+            } else if (this.newPet.species === 'Риба') {
+                imagePath = 'assets/img/fish.avif';
+            }
 
-        // Скидаємо фільтр, щоб побачити нову собаку
-        speciesFilter.value = 'Всі';
+            // Додаємо об'єкт у масив, Vue сам оновить DOM
+            this.animals.push({
+                name: this.newPet.name,
+                species: this.newPet.species,
+                ageYears: this.newPet.ageYears,
+                image: imagePath
+            });
 
-    } catch (error) {
-        // Обробляємо та виводимо помилку
-        console.error('Помилка завантаження API:', error);
-        errorMessage.textContent = 'Не вдалося завантажити собаку з API. Перевірте підключення до Інтернету або спробуйте пізніше.';
-        errorMessage.style.display = 'block';
-    } finally {
-        // Ховаємо індикатор завантаження і розблоковуємо кнопку
-        loadingIndicator.style.display = 'none';
-        fetchDogBtn.disabled = false;
+            // Очищаємо форму
+            this.newPet.name = '';
+            this.newPet.species = 'Кіт';
+            this.newPet.ageYears = 0;
+            
+            // Скидаємо фільтр
+            this.currentFilter = 'Всі';
+        },
+        
+        // Отримання даних з Dog CEO API
+        async loadRandomDog() {
+            this.isLoading = true;
+            this.apiError = ''; 
+            
+            try {
+                const response = await fetch('https://dog.ceo/api/breeds/image/random');
+                
+                if (!response.ok) {
+                    throw new Error(`Сервер відповів помилкою: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                if (data.status !== 'success') {
+                    throw new Error('API повернуло статус помилки всередині JSON');
+                }
+
+                this.animals.push({
+                    name: 'Пес',
+                    species: 'Собака',
+                    ageYears: Math.floor(Math.random() * 10) + 1,
+                    image: data.message
+                });
+                
+                this.currentFilter = 'Всі';
+
+            } catch (error) {
+                console.error('Помилка завантаження API:', error);
+                this.apiError = 'Не вдалося завантажити собаку з API. Перевірте підключення до Інтернету або спробуйте пізніше.';
+            } finally {
+                this.isLoading = false;
+            }
+        }
     }
-}
-
-// Обробник події кліку на кнопку
-fetchDogBtn.addEventListener('click', loadRandomDog);
+}).mount('#app');

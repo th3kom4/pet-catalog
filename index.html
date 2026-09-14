@@ -16,23 +16,24 @@
         </nav>
     </header>
 
-	<main>
-        <div class="main-content">
-			<section id="add-pet-section">
+    <main>
+        <div id="app" class="main-content">
+            
+            <section id="add-pet-section">
                 <h2>Додати нову тварину</h2>
-                <form id="add-pet-form">
+                <form @submit.prevent="addNewPet">
                     <label for="pet-name">Ім'я:</label>
-                    <input type="text" id="pet-name" name="name" required>
+                    <input type="text" id="pet-name" v-model="newPet.name" required>
 
                     <label for="pet-species">Вид:</label>
-                    <select id="pet-species" name="species" required>
+                    <select id="pet-species" v-model="newPet.species" required>
                         <option value="Кіт">Кіт</option>
                         <option value="Собака">Собака</option>
                         <option value="Риба">Риба</option>
                     </select>
 
                     <label for="pet-age">Вік (років):</label>
-                    <input type="number" id="pet-age" name="ageYears" required min="0" step="0.1">
+                    <input type="number" id="pet-age" v-model="newPet.ageYears" required min="0" step="0.1">
 
                     <button type="submit">Додати</button>
                 </form>
@@ -42,7 +43,7 @@
                 <h2>Фільтри</h2>
                 <form>
                     <label for="species-filter">Вид тварини:</label>
-                    <select id="species-filter" name="species">
+                    <select id="species-filter" v-model="currentFilter">
                         <option value="Всі">Всі види</option>
                         <option value="Кіт">Коти</option>
                         <option value="Собака">Собаки</option>
@@ -51,35 +52,34 @@
                 </form>
             </section>
 
-			<section id="api-section" style="text-align: center; margin-top: 32px; margin-bottom: 24px;">
-                <button id="fetch-dog-btn" style="padding: 10px 20px; font-weight: bold; background-color: #ffb74d; border: none; border-radius: 8px; cursor: pointer;">
+            <section id="api-section" style="text-align: center; margin-top: 32px; margin-bottom: 24px;">
+                <button @click="loadRandomDog" :disabled="isLoading" style="padding: 10px 20px; font-weight: bold; background-color: #ffb74d; border: none; border-radius: 8px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                     Отримати собаку з API
                 </button>
-                <p id="loading-indicator" style="display: none; color: #558b2f; font-weight: bold; margin-top: 10px;">
-                    Завантаження фотографії...
+                <p v-if="isLoading" style="color: #558b2f; font-weight: bold; margin-top: 12px;">
+                    ⏳ Завантаження фотографії...
                 </p>
-                <p id="error-message" style="display: none; color: #e57373; font-weight: bold; margin-top: 10px;"></p>
+                <p v-if="apiError" style="color: #e57373; font-weight: bold; margin-top: 12px;">
+                    {{ apiError }}
+                </p>
             </section>
 
-        	<section id="pets">
+            <section id="pets">
                 <h2>Тварини</h2>
-                <p id="pets-count" style="font-weight: bold; color: #33691e;">Всього тварин: 0</p>
+                <p style="font-weight: bold; color: #33691e;">Всього тварин: {{ filteredPets.length }}</p>
                 
-                <div class="cards" id="pets-list">
-                    <article class="static-card">
-                        <h3>Британська короткошерста</h3>
-                        <img class="pet-img" src="assets/img/cat.jpg" alt="Стара фотографія">
-                        <p class="species">Вид: Кіт</p>
-                    </article>
-                    
-                    <article class="static-card">
-                        <h3>Золотистий ретривер</h3>
-                        <img class="pet-img" src="assets/img/dog.jpg" alt="Стара фотографія">
-                        <p class="species">Вид: Собака</p>
-                    </article>
+                <div class="cards">
+                    <pet-card
+                        v-for="(pet, index) in filteredPets"
+                        :key="index"
+                        :name="pet.name"
+                        :species="pet.species"
+                        :age-years="pet.ageYears"
+                        :image="pet.image"
+                    ></pet-card>
                 </div>
             </section>
-		</div>
+        </div>
         
         <aside>
             <h2>Деталі догляду</h2>
@@ -91,6 +91,7 @@
         <p>&copy; 2026 Навчальний проєкт. Виконав Комаренко Т.В.</p>
     </footer>
 
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="js/app.js" defer></script>
 </body>
 </html>

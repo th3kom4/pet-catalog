@@ -264,36 +264,33 @@ createApp({
             this.apiError = '';
 
             try {
-                const response = await fetch('https://dog.ceo/api/breeds/image/random');
+                const response = await fetch('api/pets/random');
 
                 if (!response.ok) {
                     throw new Error(`Сервер відповів помилкою: ${response.status}`);
                 }
 
-                const data = await response.json();
+				const serverPet = await response.json();
 
-                if (data.status !== 'success') {
-                    throw new Error('API повернуло статус помилки всередині JSON');
-                }
-
-                const randomDog = {
+                // Створюємо унікальний запис на основі отриманого об'єкта
+                const newPetEntry = {
                     id: String(Date.now()),
-                    name: 'Пес',
-                    species: 'Собака',
-                    ageYears: Math.floor(Math.random() * 10) + 1,
-                    image: data.message,
-                    notes: 'Отримано з API'
+                    name: `${serverPet.name}`,
+                    species: serverPet.species,
+                    ageYears: serverPet.ageYears,
+                    image: serverPet.image,
+                    notes: serverPet.notes || 'Отримано з локального Node.js API'
                 };
 
-                await savePetToDB(randomDog);
-                this.animals.push(randomDog);
+                await savePetToDB(newPetEntry);
+                this.animals.push(newPetEntry);
 				this.syncFishCount();
                 saveToLocalStorage(this.animals);
                 this.currentFilter = 'Всі';
 
             } catch (error) {
-                console.error('Помилка завантаження API:', error);
-                this.apiError = 'Не вдалося завантажити собаку з API. Перевірте підключення до Інтернету або спробуйте пізніше.';
+                console.error('Помилка завантаження з API сервера:', error);
+                this.apiError = 'Не вдалося завантажити тварину з локального сервера. Перевірте роботу node server.js.';
             } finally {
                 this.isLoading = false;
             }

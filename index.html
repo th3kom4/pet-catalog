@@ -59,10 +59,10 @@
 
             <section id="api-section" style="text-align: center; margin-top: 32px; margin-bottom: 24px;">
                 <button @click="loadRandomDog" :disabled="isLoading" style="padding: 10px 20px; font-weight: bold; background-color: #ffb74d; border: none; border-radius: 8px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                    Отримати собаку з API
+                    Отримати тварину з API
                 </button>
                 <p v-if="isLoading" style="color: #558b2f; font-weight: bold; margin-top: 12px;">
-                    ⏳ Завантаження фотографії...
+                    Завантаження фотографії...
                 </p>
                 <p v-if="apiError" style="color: #e57373; font-weight: bold; margin-top: 12px;">
                     {{ apiError }}

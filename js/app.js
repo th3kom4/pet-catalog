@@ -67,6 +67,30 @@ function loadFromLocalStorage() {
     }
 }
 
+// Функція екранування небезпечних HTML-символів (захист від XSS)
+function escapeHtml(str) {
+    if (!str) return '';
+    const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+    };
+    return String(str).replace(/[&<>"']/g, ch => map[ch]);
+}
+
+// Валідація URL зображень (блокування небезпечних псевдопротоколів)
+function sanitizeImageUrl(url, fallbackUrl = 'assets/img/cat.jpg') {
+    if (!url) return fallbackUrl;
+    const trimmed = String(url).trim();
+    // Блокуємо виконання JS-коду через протоколи javascript: та data:text/html
+    if (trimmed.toLowerCase().startsWith('javascript:') || trimmed.toLowerCase().startsWith('data:text/html')) {
+        return fallbackUrl;
+    }
+    return trimmed;
+}
+
 const { createApp } = Vue;
 
 // Оголошення компонента PetCard
@@ -278,7 +302,7 @@ createApp({
                     name: `${serverPet.name}`,
                     species: serverPet.species,
                     ageYears: serverPet.ageYears,
-                    image: serverPet.image,
+                    image: sanitizeImageUrl(serverPet.image, 'assets/img/dog.jpg'),
                     notes: serverPet.notes || 'Отримано з локального Node.js API'
                 };
 
